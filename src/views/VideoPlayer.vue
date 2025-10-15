@@ -147,21 +147,16 @@ async function loadVideo() {
       await feedStore.switchFeed(feed)
     }
 
-    // Check if we have cached video data first
-    if (feedStore.currentVideo && feedStore.currentVideo.id === videoId) {
-      video.value = feedStore.currentVideo
-    } else {
-      // Load video details only if not cached
-      const videoData = await feedStore.loadVideoDetails(videoId)
+    // Always load full video details from the API to get description, published_at, etc.
+    const videoData = await feedStore.loadVideoDetails(videoId)
 
-      if (!videoData) {
-        error.value = 'Video not found'
-        return
-      }
-
-      video.value = videoData
-      feedStore.currentVideo = videoData
+    if (!videoData) {
+      error.value = 'Video not found'
+      return
     }
+
+    video.value = videoData
+    feedStore.currentVideo = videoData
   } catch (err) {
     console.error('Failed to load video:', err)
     error.value = err.message || 'Failed to load video'
